@@ -1,0 +1,13 @@
+{
+    "name": "Twilio API Tool",
+    "version": "0.2",
+    "description": "This tool makes it easy to try the Twilio API from Chrome.",
+    "browser_action": {
+        "default_icon": "twilio.png",
+		"popup": "popup.html"
+    },
+	"options_page": "options.html",
+    "permissions": [
+		"https://api.twilio.com/*"
+    ]
+}

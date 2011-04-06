@@ -1,0 +1,57 @@
+<html>
+<head><title>Twilio Extension Options</title></head>
+
+<style type="text/css">
+	body {
+		font-size: 18pt;
+	}
+	input {
+		width: 250px;
+	}
+	label {
+		display: block;
+	}
+</style>
+<script type="text/javascript">
+
+var auth_token = null;
+var acct_sid = null;
+// Saves options to localStorage.
+function save_options() {
+  localStorage['account_token'] = auth_token.value;
+  localStorage['account_sid'] = acct_sid.value;
+  var status = document.getElementById("status");
+  status.innerHTML = "Options Saved.";
+  setTimeout(function() {
+    status.innerHTML = "";
+  }, 750);
+}
+
+// Restores select box state to saved value from localStorage.
+function restore_options() {
+  auth_token = document.getElementById("auth_token");
+  acct_sid = document.getElementById("acct_sid");
+  auth_token.value = localStorage['account_token'];
+  acct_sid.value = localStorage['account_sid'];
+}
+
+</script>
+
+<body onload="restore_options()">
+
+<h1>Twilio Extension Settings</h1>
+<label for="acct_sid">
+Account SSID:
+</label>
+<input type="text" id="acct_sid" name="acct_sid"></input>
+<label for="auth_token">
+Auth Token:
+</label>
+<input type="text" name="auth_token" id="auth_token"></input>
+<div>
+You can find these values <a href="https://www.twilio.com/user/account/" target="_blank">here</a>.
+</div>
+<button onclick="save_options()">Save</button>
+<div id="status" />
+</body>
+</html>

@@ -1,0 +1,140 @@
+<style>
+body {
+  min-width:357px;
+  overflow-x:hidden;
+}
+
+.option {
+	background: #444;
+	color: red;
+}
+.option input {
+	margin-left: 4px;
+}
+.option label {
+	float: left;
+	width: 150px;
+}
+
+</style>
+<body>
+	<h1>Twilio Chrome</h1>
+	<div>
+		<a class="settings" target="_blank" href="https://www.twilio.com/user/account/">Account Settings</a>
+	</div>
+	<div>
+		 API Method: <select id="methods" onchange="update_params()">
+	 </div>
+	</select>
+	<form id="inputs">
+		<div class="generated"></div>
+		<input type="button" onclick="api_call()" value="Send Request">
+	</form>
+	<select id="optional_parameters"></select>
+	<div>
+		<h2>Response Data</h2>
+		<textarea id="response"></textarea>
+	</div>
+</body>
+<script src="jquery-1.5.1.min.js"></script>
+<script>
+	String.prototype.format = function(args) {
+		var s = this;
+		for (var i in args) {
+			var reg = new RegExp("\\{" + i + "\\}", "gm");
+			s = s.replace(reg, args[i]);
+		}
+		return s;
+	}
+	//var settings = localStorage['settings'];
+	var inputs = $("#inputs");
+	var options = $("#methods");
+	var optional_parameters = $("#optional_parameters");
+	var API_METHODS = {
+		'Outgoing SMS': {
+			'options': ['To','From','Body'],
+			'optionals': {'StatusCallback':null},
+			'url': 'https://api.twilio.com/2010-04-01/Accounts/{sid}/SMS/Messages',
+			'method': 'POST',
+		},
+		'Outgoing Call': {
+			'options': ['To','From','Url'],
+			'optionals': {'Method':'POST', 'FallbackUrl':null, 'FallbackMethod':'POST', 'StatusCallback':null, 
+				'StatusCallbackMethod':'POST','SendDigits':null, 'IfMachine':null, 'Timeout':60},
+			'url': 'https://api.twilio.com/2010-04-01/Accounts/{sid}/Calls',
+			'method': 'POST',
+		}
+	};
+	(function build_menu() {
+		$("a.settings").attr("href", chrome.extension.getURL( "options.html" ));
+		for (method in API_METHODS) {
+			options.append($("<option>").html(method));
+		}
+		optional_parameters.change(function(){
+			/*
+			* Adds an optional parameter to the form
+			*/
+			var option = this.value;
+			if (option != "") {
+				var node = make_parameter_node(option, "optional") 
+				node.addClass("option");
+				var rm_button = $("<img src='minus.png?1'>");
+				rm_button.click(function() {
+					var option = $(this).parent().children("input").attr("name");
+					$(this).parent().remove();
+					optional_parameters.append($("<option>").html(option));
+				});
+				node.append(rm_button);
+				inputs.children(".generated").append( node );
+				$(this).children("option[value="+option+"]").remove();
+			}
+		});
+		update_params();
+	})();
+	function update_params() {
+		inputs.children(".generated").children().remove();
+		optional_parameters.children("option").remove();
+		var name = options.val();
+		var params = API_METHODS[name]['options'];
+		for (var i in params) {
+			var param = params[i];
+			inputs.children(".generated").append( make_parameter_node(param, "option") );
+		}
+		optional_parameters.append($("<option>").html("-- Add Optional Parameter --").val(""));
+		var optional_params = API_METHODS[name]['optionals'];
+		for (var key in optional_params) {
+			var default_val = optional_params[key];
+			optional_parameters.append($("<option>").html(key));
+		}
+	}
+	function make_parameter_node(name, class_name) {
+		var node = $("<div>").addClass(class_name).append($("<label>").html(name)).append($("<input>").attr("name",name));
+		return node;		
+	}
+	function api_call(name) {
+		if (!name) name = options.val();
+		var params = API_METHODS[name];
+		var sid   = localStorage['account_sid'];
+		var token = localStorage['account_token'];
+		var url = params['url'].format({sid: sid});
+		var data = inputs.serialize();
+		var req = new XMLHttpRequest();
+		$.ajax({
+			contentType: "application/x-www-form-urlencoded",
+			type: params['method'],
+			dataType: "text",
+			url: url,
+			username: sid,
+			password: token,
+			success: display_response,
+			error: display_error,
+			data: data,
+		});
+	}
+	function display_response(resp, status, xhr) {
+		$('#response').val(resp);
+	}
+	function display_error(xhr, status, errorName) {
+		$("#response").val(xhr.responseText);
+	}
+</script>
