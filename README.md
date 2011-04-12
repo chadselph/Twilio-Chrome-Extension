@@ -3,6 +3,7 @@ I was unhappy with the existing extensions, as they went through an AppEngine ap
 This is a pretty early proof of concept and I'm quick to admit that I suck at Javascript, so the code isn't great yet.
 
 TODO:
+
 * Only supports a few API methods (create call, create SMS), add a lot more
 * Add links to documentation
 * Add some CSS that doesn't totally suck / UI overhaul
