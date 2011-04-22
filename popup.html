@@ -1,249 +1,59 @@
-<style>
-body {
-  min-width:357px;
-  overflow-x:hidden;
-}
+<html>
+    <head>
+        <script src="js/jquery-1.5.1.min.js"></script>
+        <script src="js/jquery.autocomplete.min.js"></script>
+        <script src="js/resource-descriptions.js"></script>
+        <script src="js/ui.js"></script>
+        <link rel="stylesheet" type="text/css" href="js/jquery.autocomplete.css" /> 
 
-.option {
-	background: #444;
-	color: red;
-}
-.option input {
-	margin-left: 4px;
-}
-.option label {
-	float: left;
-	width: 150px;
-}
-textarea {
-	width: 100%;
-	height: 70px;
-}
+        <style>
+            body {
+                min-width:357px;
+                overflow-x:hidden;
+            }
 
-</style>
-<body>
-	<h1>Twilio Chrome</h1>
-	<div>
-		<a class="settings" target="_blank" href="https://www.twilio.com/user/account/">Account Settings</a>
-	</div>
-	<div>
-		 API Method: <select id="methods" onchange="update_params()">
-	 </div>
-	</select>
-	<form id="inputs">
-		<div class="generated"></div>
-		<input type="button" onclick="api_call()" value="Send Request">
-	</form>
-	<select id="optional_parameters"></select>
-	<div>
-		<h2>Response Data</h2>
-		<textarea id="response"></textarea>
-	</div>
-</body>
-<script src="jquery-1.5.1.min.js"></script>
-<script src="jquery.autocomplete.min.js"></script>
-<link rel="stylesheet" type="text/css" href="../jquery.autocomplete.css" /> 
-<script>
-	String.prototype.format = function(args) {
-		var s = this;
-		for (var i in args) {
-			var reg = new RegExp("\\{" + i + "\\}", "gm");
-			s = s.replace(reg, args[i]);
-		}
-		return s;
-	}
-	function one_of() {
-		var choices = arguments;
-		return function() {
-			return choices;
-		}
-	}
-	function regions() {
-		return ['AK','AL','AR','AS','AZ','CA','CO','CT','DC','DE','FL','GA','GU','HI','IA','ID',
-				'IL','IN','KS','KY','LA','MA','MD','ME','MH','MI','MN','MO','MS','MT','NC','ND',
-				'NE','NH','NJ','NM','NV','NY','OH','OK','OR','PA','PR','PW','RI','SC','SD','TN',
-				'TX','UT','VA','VI','VT','WA','WI','WV','WY'];
-	}
-	function na() {
-		return [];
-	}
-	function between(a, b) {
-		return function() {
-			var list = [];
-			for( var i=a;i<b;i++) list.push(String(i));
-			return list;
-		}
-	}
-	function account_numbers() {
-		// this will fetch your numbers, the first time.
-		// TODO: add refresh button in settings
-		if (!localStorage['account_numbers']) {
-			localStorage['account_numbers'] = [];
-			var sid   = localStorage['account_sid'];
-			var token = localStorage['account_token'];
-			var response = $.ajax({
-				url: API_METHODS['List Incoming Phone Numbers']['url'].format({sid: sid})+".json",
-				username: sid,
-				password: token,
-				success: function(data) {
-					var numbers = [];
-					for (num_info in data['incoming_phone_numbers']) {
-						var ipn = data['incoming_phone_numbers'][num_info];
-						numbers.push(ipn['phone_number']);
-					}
-					localStorage['account_numbers'] = numbers;
-				}
-			});
-		}
-		// returns too soon to work on the first load, but should work after
-		return localStorage['account_numbers'].split(",");
-	}
-	function GET_or_POST() {
-		return ["GET", "POST"];
-	}
-	//var settings = localStorage['settings'];
-	var inputs = $("#inputs");
-	var options = $("#methods");
-	var optional_parameters = $("#optional_parameters");
-	var API_METHODS = {
-		'Outgoing SMS': {
-			'required': {'To':na, 'From':account_numbers, 'Body':na},
-			'optional': {'StatusCallback':na},
-			'url': 'https://api.twilio.com/2010-04-01/Accounts/{sid}/SMS/Messages',
-			'method': 'POST',
-		},
-		'Outgoing Call': {
-			'required': {'To':na, 'From':account_numbers, 'Url':na},
-			'optional': {'Method':GET_or_POST, 'FallbackUrl':na, 'FallbackMethod':GET_or_POST, 'StatusCallback':na, 
-				'StatusCallbackMethod':GET_or_POST, 'SendDigits': one_of("Yes", "No"), 'IfMachine':na, 'Timeout':one_of("60")},
-			'url': 'https://api.twilio.com/2010-04-01/Accounts/{sid}/Calls',
-			'method': 'POST',
-		},
-		'Lookup Account': {
-			'required': {},
-			'optional': {},
-			'url': 'https://api.twilio.com/2010-04-01/Accounts/{sid}',
-			'method': 'GET'
-		},
-		'Modify Account': {
-			'required': {},
-			'optional': {'FriendlyName':na, 'Status':one_of('active', 'closed', 'suspended')},
-			'url': 'https://api.twilio.com/2010-04-01/Accounts/{sid}',
-			'method': 'GET'
-		},
-		'Create Subaccount': {
-			'required': {},
-			'optional': {'FriendlyName':na},
-			'url': 'https://api.twilio.com/2010-04-01/Accounts',
-			'method':'POST'
-		},
-		'Find Phone Number (US)': {
-			'required': {},
-			'optional': {'AreaCode': na, 'Contains': na, 'InRegion': regions, 'InPostalCode': na},
-			'url': 'https://api.twilio.com/2010-04-01/Accounts/{sid}/AvailablePhoneNumbers/US/Local',
-			'method': 'GET',
-		},
-		'List Outgoing Caller IDs': {
-			'required': {},
-			'optional': {'PhoneNumber':account_numbers, 'FriendlyName':na},
-			'url': 'https://api.twilio.com/2010-04-01/Accounts/{sid}/OutgoingCallerIds',
-			'method': 'GET'
-		},
-		'List Incoming Phone Numbers': {
-			'required': {},
-			'optional': {'PhoneNumber':account_numbers, 'FriendlyName':na},
-			'url': 'https://api.twilio.com/2010-04-01/Accounts/{sid}/IncomingPhoneNumbers',
-			'method': 'GET',
-		},
-		'Add Caller ID': {
-			'required': {'PhoneNumber':na},
-			'optional': {'FriendlyName': na, 'CallDelay': between(0,60), 'Extension': na},
-			'url': 'https://api.twilio.com/2010-04-01/Accounts/{sid}/OutgoingCallerIds',
-			'method': 'POST',
-		},
+            .option {
+                background: #444;
+                color: red;
+            }
+            .option input {
+                margin-left: 4px;
+            }
+            .option label {
+                float: left;
+                width: 150px;
+            }
+            textarea {
+                width: 100%;
+                height: 70px;
+            }
 
-
-		'Recordings List': {
-			'required':  {},
-			'optional': {},
-			'url': 'https://api.twilio.com/2010-04-01/Accounts/{sid}/Recordings',
-			'method': 'GET',
-		},
-	};
-	(function build_menu() {
-		$("a.settings").attr("href", chrome.extension.getURL( "options.html" ));
-		for (method in API_METHODS) {
-			options.append($("<option>").html(method));
-		}
-		optional_parameters.change(function(){
-			/*
-			* Adds an optional parameter to the form
-			*/
-			var option = this.value;
-			if (option != "") {
-				var node = make_parameter_node(option, "optional") 
-				var rm_button = $("<img src='minus.png?1'>");
-				rm_button.click(function() {
-					var option = $(this).parent().children("input").attr("name");
-					$(this).parent().remove();
-					optional_parameters.append($("<option>").html(option));
-				});
-				node.append(rm_button);
-				inputs.children(".generated").append( node );
-				$(this).children("option[value="+option+"]").remove();
-			}
-		});
-		update_params();
-	})();
-	function update_params() {
-		inputs.children(".generated").children().remove();
-		optional_parameters.children("option").remove();
-		var name = options.val();
-		var params = API_METHODS[name]['required'];
-		for (var i in params) {
-			var param = params[i];
-			inputs.children(".generated").append( make_parameter_node(i, "required", param) );
-		}
-		optional_parameters.append($("<option>").html("-- Add Optional Parameter --").val(""));
-		var optional_params = API_METHODS[name]['optional'];
-		for (var key in optional_params) {
-			var default_val = optional_params[key];
-			optional_parameters.append($("<option>").html(key));
-		}
-	}
-	function make_parameter_node(name, type, suggestions_call) {
-		if (!suggestions_call) {
-			var suggestions_call = API_METHODS[options.val()][type][name];
-		}
-		var input_box = $("<input>").attr("name", name).autocomplete(suggestions_call(), {matchContains: true, minChars:0, mustMatch:false});
-		var node = $("<div>").addClass(type).addClass("option").append($("<label>").html(name)).append(input_box);
-		return node;		
-	}
-	function api_call(name) {
-		if (!name) name = options.val();
-		var output_format = "json";
-		var params = API_METHODS[name];
-		var sid   = localStorage['account_sid'];
-		var token = localStorage['account_token'];
-		var url = params['url'].format({sid: sid})+"."+output_format;
-		var data = inputs.serialize();
-		var req = new XMLHttpRequest();
-		$.ajax({
-			contentType: "application/x-www-form-urlencoded",
-			type: params['method'],
-			dataType: "text",
-			url: url,
-			username: sid,
-			password: token,
-			success: display_response,
-			error: display_error,
-			data: data,
-		});
-	}
-	function display_response(resp, status, xhr) {
-		$('#response').val(resp);
-	}
-	function display_error(xhr, status, errorName) {
-		$("#response").val(xhr.responseText);
-	}
-</script>
+        </style>
+        <script type="text/javascript">
+            
+            $(document).ready(function() {
+                init();
+            });
+            
+        </script>
+    </head>
+    <body>
+        <h1>Twilio Chrome</h1>
+        <div>
+            <a class="settings" target="_blank" href="https://www.twilio.com/user/account/">Account Settings</a>
+        </div>
+        <div>
+            API Method: <select id="methods" onchange="update_params()">
+            </div>
+        </select>
+        <form id="inputs">
+            <div class="generated"></div>
+            <input type="button" onclick="api_call()" value="Send Request">
+        </form>
+        <select id="optional_parameters"></select>
+        <div>
+            <h2>Response Data</h2>
+            <textarea id="response"></textarea>
+        </div>
+    </body>
+</html>

@@ -3,7 +3,7 @@
     "version": "0.2",
     "description": "This tool makes it easy to try the Twilio API from Chrome.",
     "browser_action": {
-        "default_icon": "twilio.png",
+        "default_icon": "img/twilio.png",
 		"popup": "popup.html"
     },
 	"options_page": "options.html",
