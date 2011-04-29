@@ -19,15 +19,15 @@ function build_menu() {
       */
         var option = this.value;
         if (option != "") {
-        var node = make_parameter_node(option, "optional") 
-        var rm_button = $("<img src='img/minus.png?1'>");
-        rm_button.click(function() {
-            var option = $(this).parent().children("input").attr("name");
-            $(this).parent().remove();
-            optional_parameters.append($("<option>").html(option));
-        });
-        node.append(rm_button);
-        inputs.children(".generated").append( node );
+            var node = make_parameter_node(option, "optional");
+            var rm_button = $("<img src='img/minus.png?1'>");
+            rm_button.click(function() {
+                var option = $(this).parent().children("input").attr("name");
+                $(this).parent().remove();
+                optional_parameters.append($("<option>").html(option));
+            });
+            node.append(rm_button);
+            inputs.children(".generated").append( node );
             $(this).children("option[value="+option+"]").remove();
         }
     });
@@ -57,19 +57,18 @@ function make_parameter_node(name, type, suggestions_call) {
     var node = $("<div>").addClass(type).addClass("option").append($("<label>").html(name)).append(input_box);
     return node;        
 }
-function api_call(name) {
+function api_call(name, output_format) {
     if (!name) name = options.val();
-    var output_format = "json";
+    if (!output_format) output_format = "json";
     var params = API_METHODS[name];
     var sid   = localStorage['account_sid'];
     var token = localStorage['account_token'];
-    var url = params['url'].format({sid: sid})+"."+output_format;
+    var url = params['url'].format({AccountSid: sid})+"."+output_format;
     var data = inputs.serialize();
     var req = new XMLHttpRequest();
     $.ajax({
         contentType: "application/x-www-form-urlencoded",
         type: params['method'],
-        dataType: "text",
         url: url,
         username: sid,
         password: token,
@@ -79,6 +78,11 @@ function api_call(name) {
     });
 }
 function display_response(resp, status, xhr) {
+    if ( xhr.responseXML ) {
+        resp = xhr.responseText;
+    } else if ($.type(resp) == "object") {
+        resp = JSON.stringify(resp, null, 4);
+    }
     $('#response').val(resp);
 }
 function display_error(xhr, status, errorName) {

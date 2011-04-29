@@ -70,26 +70,26 @@ var API_METHODS = {
     'Outgoing SMS': {
         'required': {'To':na, 'From':account_numbers, 'Body':na},
         'optional': {'StatusCallback':na},
-        'url': 'https://api.twilio.com/2010-04-01/Accounts/{sid}/SMS/Messages',
+        'url': 'https://api.twilio.com/2010-04-01/Accounts/{AccountSid}/SMS/Messages',
         'method': 'POST',
     },
     'Outgoing Call': {
         'required': {'To':na, 'From':account_numbers, 'Url':na},
         'optional': {'Method':GET_or_POST, 'FallbackUrl':na, 'FallbackMethod':GET_or_POST, 'StatusCallback':na, 
             'StatusCallbackMethod':GET_or_POST, 'SendDigits': one_of("Yes", "No"), 'IfMachine':na, 'Timeout':one_of("60")},
-        'url': 'https://api.twilio.com/2010-04-01/Accounts/{sid}/Calls',
+        'url': 'https://api.twilio.com/2010-04-01/Accounts/{AccountSid}/Calls',
         'method': 'POST',
     },
     'Lookup Account': {
         'required': {},
         'optional': {},
-        'url': 'https://api.twilio.com/2010-04-01/Accounts/{sid}',
+        'url': 'https://api.twilio.com/2010-04-01/Accounts/{AccountSid}',
         'method': 'GET'
     },
     'Modify Account': {
         'required': {},
         'optional': {'FriendlyName':na, 'Status':one_of('active', 'closed', 'suspended')},
-        'url': 'https://api.twilio.com/2010-04-01/Accounts/{sid}',
+        'url': 'https://api.twilio.com/2010-04-01/Accounts/{AccountSid}',
         'method': 'GET'
     },
     'Create Subaccount': {
@@ -101,25 +101,25 @@ var API_METHODS = {
     'Find Phone Number (US)': {
         'required': {},
         'optional': {'AreaCode': na, 'Contains': na, 'InRegion': regions, 'InPostalCode': na},
-        'url': 'https://api.twilio.com/2010-04-01/Accounts/{sid}/AvailablePhoneNumbers/US/Local',
+        'url': 'https://api.twilio.com/2010-04-01/Accounts/{AccountSid}/AvailablePhoneNumbers/US/Local',
         'method': 'GET',
     },
     'List Outgoing Caller IDs': {
         'required': {},
         'optional': {'PhoneNumber':account_numbers, 'FriendlyName':na},
-        'url': 'https://api.twilio.com/2010-04-01/Accounts/{sid}/OutgoingCallerIds',
+        'url': 'https://api.twilio.com/2010-04-01/Accounts/{AccountSid}/OutgoingCallerIds',
         'method': 'GET'
     },
     'List Incoming Phone Numbers': {
         'required': {},
         'optional': {'PhoneNumber':account_numbers, 'FriendlyName':na},
-        'url': 'https://api.twilio.com/2010-04-01/Accounts/{sid}/IncomingPhoneNumbers',
+        'url': 'https://api.twilio.com/2010-04-01/Accounts/{AccountSid}/IncomingPhoneNumbers',
         'method': 'GET',
     },
     'Add Caller ID': {
         'required': {'PhoneNumber':na},
         'optional': {'FriendlyName': na, 'CallDelay': between(0,60), 'Extension': na},
-        'url': 'https://api.twilio.com/2010-04-01/Accounts/{sid}/OutgoingCallerIds',
+        'url': 'https://api.twilio.com/2010-04-01/Accounts/{AccountSid}/OutgoingCallerIds',
         'method': 'POST',
     },
 
@@ -127,7 +127,7 @@ var API_METHODS = {
     'Recordings List': {
         'required':  {},
         'optional': {},
-        'url': 'https://api.twilio.com/2010-04-01/Accounts/{sid}/Recordings',
+        'url': 'https://api.twilio.com/2010-04-01/Accounts/{AccountSid}/Recordings',
         'method': 'GET',
     },
 };
