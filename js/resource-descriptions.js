@@ -36,7 +36,7 @@ function account_numbers() {
         var sid   = localStorage['account_sid'];
         var token = localStorage['account_token'];
         var response = $.ajax({
-            url: API_METHODS['List Incoming Phone Numbers']['url'].format({sid: sid})+".json",
+            url: API_METHODS['List Incoming Phone Numbers']['url'].format({AccountSid: sid})+".json",
             username: sid,
             password: token,
             success: function(data) {
