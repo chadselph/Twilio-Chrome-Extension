@@ -5,11 +5,17 @@
         <script src="js/resource-descriptions.js"></script>
         <script src="js/ui.js"></script>
         <link rel="stylesheet" type="text/css" href="js/jquery.autocomplete.css" /> 
+        <link rel='stylesheet' type='text/css' href='http://static1.twilio.com/packages/base.css' />
 
         <style>
             body {
+                margin: 0 0 0 0;
                 min-width:357px;
                 overflow-x:hidden;
+            }
+
+            #main-header {
+                width: 100%;
             }
 
             .option {
@@ -38,7 +44,11 @@
         </script>
     </head>
     <body>
-        <h1>Twilio Chrome</h1>
+        <div id="main-header">
+            <a id="header-logo" href="/"><img src="http://static0.twilio.com/packages/base/images/twilio-header-logo.png" alt="Twilio" /></a> 
+            <h1>Google Chrome Extension</h1>
+        </div>
+
         <div>
             <a class="settings" target="_blank" href="https://www.twilio.com/user/account/">Account Settings</a>
         </div>
@@ -48,7 +58,8 @@
         </select>
         <form id="inputs">
             <div class="generated"></div>
-            <input type="button" onclick="api_call()" value="Send Request">
+            <button type="button" class="enabled-submit-button submit-button" onclick="api_call()"><span>Send Request</span></button>
+
         </form>
         <select id="optional_parameters"></select>
         <div>
