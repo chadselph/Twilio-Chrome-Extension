@@ -18,7 +18,12 @@
                 width: 100%;
             }
 
-            .option {
+            #account-navigation {
+                width: 100%;
+                padding: 1px;
+            }
+
+            .aoption {
                 background: #444;
                 color: red;
             }
@@ -48,10 +53,19 @@
             <a id="header-logo" href="/"><img src="http://static0.twilio.com/packages/base/images/twilio-header-logo.png" alt="Twilio" /></a> 
             <h1>Google Chrome Extension</h1>
         </div>
-
-        <div>
-            <a class="settings" target="_blank" href="https://www.twilio.com/user/account/">Account Settings</a>
+        <div id="wrap-account-navigation">
+            <div id="account-navigation">
+                <ul>
+                    <li>
+                        <a class="TextCopy settings" target="_blank" href="https://www.twilio.com/user/account/">Settings</a>
+                    </li>
+                    <li>
+                        <a class="TextCopy" target="_blank" href="http://twilio.com/docs">Docs</a>
+                    </li>
+                </ul>
+            </div>
         </div>
+
         <div>
             API Method: <select id="methods" onchange="update_params()">
             </div>
